@@ -28,6 +28,9 @@
 /** YES if any empty dataset is visible. */
 @property (nonatomic, readonly, getter = isEmptyDataSetVisible) BOOL emptyDataSetVisible;
 
+//点击全区域响应 -emptyDataSet:didTapView:
+@property (nonatomic, assign) BOOL tapFullArea;
+
 /**
  Reloads the empty dataset content receiver.
  @discussion Call this method to force all the data to refresh. Calling -reloadData is similar, but this forces only the empty dataset to reload, not the entire table view or collection view.

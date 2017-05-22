@@ -40,6 +40,8 @@
 
 @property (nonatomic, assign) BOOL fadeInOnDisplay;
 
+@property (nonatomic, assign) BOOL tapFullArea;
+
 - (void)setupConstraints;
 - (void)prepareForReuse;
 
@@ -80,6 +82,23 @@ static char const * const kEmptyDataSetView =       "emptyDataSetView";
     return view ? !view.hidden : NO;
 }
 
+-(void)setTapFullArea:(BOOL)tapFullArea {
+    objc_setAssociatedObject(self, _cmd, @(tapFullArea), OBJC_ASSOCIATION_ASSIGN);
+    if ([self isEmptyDataSetVisible]) {
+        self.emptyDataSetView.tapFullArea = tapFullArea;
+    }
+}
+
+- (BOOL)tapFullArea {
+    NSNumber *tapFullAreaNum = objc_getAssociatedObject(self, @selector(setTapFullArea:));
+    if (nil == tapFullAreaNum) {
+        return NO;
+    }
+    else {
+        return [tapFullAreaNum boolValue];
+    }
+}
+
 
 #pragma mark - Getters (Private)
 
@@ -97,7 +116,13 @@ static char const * const kEmptyDataSetView =       "emptyDataSetView";
         view.tapGesture.delegate = self;
         [view addGestureRecognizer:view.tapGesture];
         
+        NSNumber *tapFullAreaNum = objc_getAssociatedObject(self, @selector(setTapFullArea:));
+        if (tapFullAreaNum) {
+            view.tapFullArea = [tapFullAreaNum boolValue];
+        }
+        
         [self setEmptyDataSetView:view];
+        
     }
     return view;
 }
@@ -1033,6 +1058,11 @@ Class dzn_baseClassToSwizzleForTarget(id target)
     // Return either the contentView or customView
     if ([hitView isEqual:_contentView] || [hitView isEqual:_customView]) {
         return hitView;
+    }
+    if (self.tapFullArea) {
+        if ([self isEqual:hitView]) {
+            return self;
+        }
     }
     
     return nil;
